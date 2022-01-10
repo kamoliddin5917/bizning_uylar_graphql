@@ -31,4 +31,9 @@ module.exports = gql`
     message: String!
     company: Company!
   }
+  extend type Subscription {
+    companyCreated: Company
+    companyUpdated: Company
+    companyDeleted: Company
+  }
 `;

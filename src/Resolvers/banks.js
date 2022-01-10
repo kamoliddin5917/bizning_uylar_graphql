@@ -1,5 +1,6 @@
 const model = require("../models/bank");
 const { multipleFileUpload, deleteFile } = require("../middlewares/file");
+const pubSub = require("../PubSub/PubSub");
 
 module.exports = {
   Query: {
@@ -48,6 +49,10 @@ module.exports = {
 
         if (!createBank) throw new Error("SERVER_ERROR_CREATED!");
 
+        pubSub.publish("BANK_CREATED", {
+          bankCreated: createBank,
+        });
+
         return {
           status: 201,
           message: "BANK_CREATED!",
@@ -89,6 +94,10 @@ module.exports = {
 
           deleteFile(findBank.bank_media);
 
+          pubSub.publish("BANK_UPDATED", {
+            bankUpdated: updateBankMedia,
+          });
+
           return {
             status: 200,
             message: "BANK_UPDATED",
@@ -106,6 +115,10 @@ module.exports = {
         );
 
         if (!updateBank) throw new Error("SERVER_ERROR_UPDATED!");
+
+        pubSub.publish("BANK_UPDATED", {
+          bankUpdated: updateBank,
+        });
 
         return {
           status: 200,
@@ -126,6 +139,10 @@ module.exports = {
 
         deleteFile(deleteBank.bank_media);
 
+        pubSub.publish("BANK_DELETED", {
+          bankDeleted: deleteBank,
+        });
+
         return {
           status: 200,
           message: "BANK_DELETED!",
@@ -134,6 +151,17 @@ module.exports = {
       } catch (error) {
         throw new Error(error.message);
       }
+    },
+  },
+  Subscription: {
+    bankCreated: {
+      subscribe: () => pubSub.asyncIterator("BANK_CREATED"),
+    },
+    bankUpdated: {
+      subscribe: () => pubSub.asyncIterator("BANK_UPDATED"),
+    },
+    bankDeleted: {
+      subscribe: () => pubSub.asyncIterator("BANK_DELETED"),
     },
   },
 };

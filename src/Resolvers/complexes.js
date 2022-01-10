@@ -1,5 +1,6 @@
 const model = require("../models/complex");
 const { multipleFileUpload, deleteFile } = require("../middlewares/file");
+const pubSub = require("../PubSub/PubSub");
 
 module.exports = {
   Query: {
@@ -44,6 +45,10 @@ module.exports = {
 
         if (!createComplex) throw new Error("SERVER_ERROR_CREATED!");
 
+        pubSub.publish("COMPLEX_CREATED", {
+          complexCreated: createComplex,
+        });
+
         return {
           status: 201,
           message: "COMPLEX_CREATED!",
@@ -81,6 +86,10 @@ module.exports = {
 
           deleteFile(findComplex.complex_media);
 
+          pubSub.publish("COMPLEX_UPDATED", {
+            complexUpdated: updateComplexMedia,
+          });
+
           return {
             status: 200,
             message: "COMPLEX_UPDATED",
@@ -95,6 +104,10 @@ module.exports = {
         );
 
         if (!updateComplex) throw new Error("SERVER_ERROR_UPDATED!");
+
+        pubSub.publish("COMPLEX_UPDATED", {
+          complexUpdated: updateComplex,
+        });
 
         return {
           status: 200,
@@ -115,6 +128,10 @@ module.exports = {
 
         deleteFile(deleteComplex.complex_media);
 
+        pubSub.publish("COMPLEX_DELETED", {
+          complexDeleted: deleteComplex,
+        });
+
         return {
           status: 200,
           message: "COMPLEX_DELETED!",
@@ -123,6 +140,17 @@ module.exports = {
       } catch (error) {
         throw new Error(error.message);
       }
+    },
+  },
+  Subscription: {
+    complexCreated: {
+      subscribe: () => pubSub.asyncIterator("COMPLEX_CREATED"),
+    },
+    complexUpdated: {
+      subscribe: () => pubSub.asyncIterator("COMPLEX_UPDATED"),
+    },
+    complexDeleted: {
+      subscribe: () => pubSub.asyncIterator("COMPLEX_DELETED"),
     },
   },
 };

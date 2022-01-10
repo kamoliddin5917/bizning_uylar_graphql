@@ -41,4 +41,9 @@ module.exports = gql`
     token: String
     user: User!
   }
+  extend type Subscription {
+    uuserCreated: User
+    uuserUpdated: User
+    uuserDeleted: User
+  }
 `;

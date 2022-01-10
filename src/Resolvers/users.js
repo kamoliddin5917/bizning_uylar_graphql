@@ -2,6 +2,7 @@ const model = require("../models/user");
 const { hashPassword, comparePassword } = require("../utils/bcrypt");
 const { sign, verify } = require("../utils/jwt");
 const { singleFileUpload, deleteFile } = require("../middlewares/file");
+const pubSub = require("../PubSub/PubSub");
 
 module.exports = {
   Query: {
@@ -44,6 +45,10 @@ module.exports = {
 
         const token = sign({ userId: createUser.user_id });
 
+        pubSub.publish("USER_CREATED", {
+          uuserCreated: createUser,
+        });
+
         return {
           status: 201,
           message: "CREATE_USER",
@@ -79,6 +84,10 @@ module.exports = {
 
           deleteFile(findUser.user_image);
 
+          pubSub.publish("USER_UPDATED", {
+            uuserUpdated: updateUser,
+          });
+
           return {
             status: 200,
             message: "UPDATE_USER",
@@ -92,6 +101,10 @@ module.exports = {
           userId
         );
         if (!updateUser) throw new Error("SERVER_ERROR_UPDATE!");
+
+        pubSub.publish("USER_UPDATED", {
+          uuserUpdated: updateUser,
+        });
 
         return {
           status: 200,
@@ -111,6 +124,10 @@ module.exports = {
         if (!deleteUser) throw new Error("SERVER_ERROR_DELETE!");
 
         deleteFile(deleteUser.user_image);
+
+        pubSub.publish("USER_DELETED", {
+          uuserDeleted: deleteUser,
+        });
 
         return {
           status: 200,
@@ -176,6 +193,17 @@ module.exports = {
       } catch (error) {
         throw new Error(error.message);
       }
+    },
+  },
+  Subscription: {
+    uuserCreated: {
+      subscribe: () => pubSub.asyncIterator("USER_CREATED"),
+    },
+    uuserUpdated: {
+      subscribe: () => pubSub.asyncIterator("USER_UPDATED"),
+    },
+    uuserDeleted: {
+      subscribe: () => pubSub.asyncIterator("USER_DELETED"),
     },
   },
 };

@@ -1,5 +1,6 @@
 const model = require("../models/house");
 const { multipleFileUpload, deleteFile } = require("../middlewares/file");
+const pubSub = require("../PubSub/PubSub");
 
 module.exports = {
   Query: {
@@ -53,6 +54,10 @@ module.exports = {
 
         if (!createHouse) throw new Error("SERVER_ERROR_CREATED!");
 
+        pubSub.publish("HOUSE_CREATED", {
+          houseCreated: createHouse,
+        });
+
         return {
           status: 201,
           message: "HOUSE_CREATED!",
@@ -94,6 +99,10 @@ module.exports = {
 
           deleteFile(findHouse.house_media);
 
+          pubSub.publish("HOUSE_UPDATED", {
+            houseUpdated: updateHouseMedia,
+          });
+
           return {
             status: 200,
             message: "HOUSE_UPDATED",
@@ -111,6 +120,10 @@ module.exports = {
         );
 
         if (!updateHouse) throw new Error("SERVER_ERROR_UPDATED!");
+
+        pubSub.publish("HOUSE_UPDATED", {
+          houseUpdated: updateHouse,
+        });
 
         return {
           status: 200,
@@ -131,6 +144,10 @@ module.exports = {
 
         deleteFile(deleteHouse.house_media);
 
+        pubSub.publish("HOUSE_DELETED", {
+          houseDeleted: deleteHouse,
+        });
+
         return {
           status: 200,
           message: "HOUSE_DELETED!",
@@ -139,6 +156,17 @@ module.exports = {
       } catch (error) {
         throw new Error(error.message);
       }
+    },
+  },
+  Subscription: {
+    houseCreated: {
+      subscribe: () => pubSub.asyncIterator("HOUSE_CREATED"),
+    },
+    houseUpdated: {
+      subscribe: () => pubSub.asyncIterator("HOUSE_UPDATED"),
+    },
+    houseDeleted: {
+      subscribe: () => pubSub.asyncIterator("HOUSE_DELETED"),
     },
   },
 };

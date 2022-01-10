@@ -39,4 +39,9 @@ module.exports = gql`
     message: String!
     bank: Bank!
   }
+  extend type Subscription {
+    bankCreated: Bank
+    bankUpdated: Bank
+    bankDeleted: Bank
+  }
 `;

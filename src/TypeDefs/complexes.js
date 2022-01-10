@@ -32,4 +32,9 @@ module.exports = gql`
     message: String!
     complex: Complex!
   }
+  extend type Subscription {
+    complexCreated: Complex
+    complexUpdated: Complex
+    complexDeleted: Complex
+  }
 `;

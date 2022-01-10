@@ -1,5 +1,6 @@
 const model = require("../models/company");
 const { multipleFileUpload, deleteFile } = require("../middlewares/file");
+const pubSub = require("../PubSub/PubSub");
 
 module.exports = {
   Query: {
@@ -39,6 +40,10 @@ module.exports = {
 
         if (!createCompany) throw new Error("SERVER_ERROR_CREATED!");
 
+        pubSub.publish("COMPANY_CREATED", {
+          companyCreated: createCompany,
+        });
+
         return {
           status: 201,
           message: "COMPANY_CREATED!",
@@ -76,6 +81,10 @@ module.exports = {
 
           deleteFile(findCompany.company_media);
 
+          pubSub.publish("COMPANY_UPDATED", {
+            companyUpdated: updateCompanyMedia,
+          });
+
           return {
             status: 200,
             message: "COMPANY_UPDATED",
@@ -90,6 +99,10 @@ module.exports = {
         );
 
         if (!updateCompany) throw new Error("SERVER_ERROR_UPDATED!");
+
+        pubSub.publish("COMPANY_UPDATED", {
+          companyUpdated: updateCompany,
+        });
 
         return {
           status: 200,
@@ -110,6 +123,10 @@ module.exports = {
 
         deleteFile(deleteCompany.company_media);
 
+        pubSub.publish("COMPANY_DELETED", {
+          companyDeleted: deleteCompany,
+        });
+
         return {
           status: 200,
           message: "COMPANY_DELETED!",
@@ -118,6 +135,17 @@ module.exports = {
       } catch (error) {
         throw new Error(error.message);
       }
+    },
+  },
+  Subscription: {
+    companyCreated: {
+      subscribe: () => pubSub.asyncIterator("COMPANY_CREATED"),
+    },
+    companyUpdated: {
+      subscribe: () => pubSub.asyncIterator("COMPANY_UPDATED"),
+    },
+    companyDeleted: {
+      subscribe: () => pubSub.asyncIterator("COMPANY_DELETED"),
     },
   },
 };

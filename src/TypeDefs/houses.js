@@ -42,4 +42,9 @@ module.exports = gql`
     message: String!
     house: House!
   }
+  extend type Subscription {
+    houseCreated: House
+    houseUpdated: House
+    houseDeleted: House
+  }
 `;
