@@ -13,34 +13,35 @@ module.exports = gql`
     date: String!
     companies: [Company]
   }
+
+  input UserCreateInput {
+    firstname: String!
+    lastname: String!
+    email: Email!
+    password: Password!
+  }
+
+  input UserUpdateInput {
+    firstname: String
+    lastname: String
+    image: Upload
+  }
+
+  input UserLoginInput {
+    admin: Admin!
+    email: Email
+    password: Password!
+    username: String
+    login: String
+  }
+
   extend type Mutation {
-    createUser(
-      firstname: String!
-      lastname: String!
-      email: Email!
-      password: Password!
-    ): Result!
-    updateUser(firstname: String, lastname: String, image: Upload): Result!
-    deleteUser: Result!
-    login(
-      admin: Admin!
-      email: Email
-      password: Password!
-      username: String
-      login: String
-    ): Result!
+    createUser(newUser: UserCreateInput!): ResultUnion!
+    updateUser(updateUser: UserUpdateInput!): ResultUnion!
+    deleteUser: ResultUnion!
+    login(loginUser: UserLoginInput!): ResultUnion!
   }
 
-  type Result {
-    status: Int!
-    message: String!
-    data: UserResult!
-  }
-
-  type UserResult {
-    token: String
-    user: User!
-  }
   extend type Subscription {
     uuserCreated: User
     uuserUpdated: User

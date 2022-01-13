@@ -38,7 +38,8 @@ module.exports = {
           userId
         );
 
-        if (!createCompany) throw new Error("SERVER_ERROR_CREATED!");
+        if (!createCompany)
+          return { status: 500, message: "SERVER_ERROR_CREATED!" };
 
         pubSub.publish("COMPANY_CREATED", {
           companyCreated: createCompany,
@@ -61,11 +62,12 @@ module.exports = {
       try {
         userAuth(ctx);
 
-        if (!name && !media && !inform) throw new Error("BAD_REQUEST!");
+        if (!name && !media && !inform)
+          return { status: 400, message: "BAD_REQUEST!" };
 
         const findCompany = await model.findCompany(id);
 
-        if (!findCompany) throw new Error("SERVER_ERROR_FIND!");
+        if (!findCompany) return { status: 500, message: "SERVER_ERROR_FIND!" };
 
         if (media) {
           const medias = await multipleFileUpload(media);
@@ -77,7 +79,8 @@ module.exports = {
             id
           );
 
-          if (!updateCompanyMedia) throw new Error("SERVER_ERROR_UPDATED!");
+          if (!updateCompanyMedia)
+            return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
           deleteFile(findCompany.company_media);
 
@@ -98,7 +101,8 @@ module.exports = {
           id
         );
 
-        if (!updateCompany) throw new Error("SERVER_ERROR_UPDATED!");
+        if (!updateCompany)
+          return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
         pubSub.publish("COMPANY_UPDATED", {
           companyUpdated: updateCompany,
@@ -119,7 +123,8 @@ module.exports = {
 
         const deleteCompany = await model.deleteCompany(id);
 
-        if (!deleteCompany) throw new Error("SERVER_ERROR_DELETED!");
+        if (!deleteCompany)
+          return { status: 500, message: "SERVER_ERROR_DELETED!" };
 
         deleteFile(deleteCompany.company_media);
 

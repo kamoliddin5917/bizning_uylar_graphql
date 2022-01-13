@@ -2,6 +2,16 @@ CREATE DATABASE ucharteam;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE TABLE verify_users(
+    id SERIAL NOT NULL PRIMARY KEY,
+    firstname varchar(50) not null,
+    lastname varchar(50) not null,
+    email varchar(70) not null,
+    password text not null,
+    cod bigint not null,
+    is_active boolean default false
+);
+
 CREATE TABLE admins(
     admin_id uuid NOT NULL default uuid_generate_v4() PRIMARY KEY,
     admin_username varchar(50) unique not null,

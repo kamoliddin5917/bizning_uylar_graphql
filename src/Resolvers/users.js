@@ -28,11 +28,14 @@ module.exports = {
     companies: async ({ user_id }) => await model.companies(user_id),
   },
   Mutation: {
-    createUser: async (_, { firstname, lastname, email, password }) => {
+    createUser: async (
+      _,
+      { newUser: { firstname, lastname, email, password } }
+    ) => {
       try {
         const hashedPassword = await hashPassword(password);
 
-        if (!hashedPassword) throw new Error("SERVER_ERROR!");
+        if (!hashedPassword) return { status: 500, message: "SERVER_ERROR!" };
 
         const createUser = await model.createUser(
           firstname,
@@ -41,7 +44,7 @@ module.exports = {
           hashedPassword
         );
 
-        if (!createUser) throw new Error("BAD_REQUEST!");
+        if (!createUser) return { status: 400, message: "BAD_REQUEST!" };
 
         const token = sign({ userId: createUser.user_id });
 
@@ -60,16 +63,18 @@ module.exports = {
     },
     updateUser: async (
       _,
-      { firstname, lastname, image },
+      { updateUser: { firstname, lastname, image } },
       { ctx, userAuth }
     ) => {
       try {
-        if (!firstname && !lastname && !image) throw new Error("BAD_REQUEST!");
+        if (!firstname && !lastname && !image)
+          return { status: 400, message: "BAD_REQUEST!" };
 
         const userId = userAuth(ctx);
 
         const findUser = await model.findUser(userId);
-        if (!findUser) throw new Error("SERVER_ERROR_FIND!");
+
+        if (!findUser) return { status: 500, message: "SERVER_ERROR_FIND!" };
 
         if (image) {
           const imageName = await singleFileUpload(image);
@@ -80,7 +85,8 @@ module.exports = {
             imageName,
             userId
           );
-          if (!updateUser) throw new Error("SERVER_ERROR_UPDATE!");
+          if (!updateUser)
+            return { status: 500, message: "SERVER_ERROR_UPDATE!" };
 
           deleteFile(findUser.user_image);
 
@@ -100,7 +106,8 @@ module.exports = {
           lastname || findUser.user_lastname,
           userId
         );
-        if (!updateUser) throw new Error("SERVER_ERROR_UPDATE!");
+        if (!updateUser)
+          return { status: 500, message: "SERVER_ERROR_UPDATE!" };
 
         pubSub.publish("USER_UPDATED", {
           uuserUpdated: updateUser,
@@ -121,7 +128,8 @@ module.exports = {
 
         const deleteUser = await model.deleteUser(userId);
 
-        if (!deleteUser) throw new Error("SERVER_ERROR_DELETE!");
+        if (!deleteUser)
+          return { status: 500, message: "SERVER_ERROR_DELETE!" };
 
         deleteFile(deleteUser.user_image);
 
@@ -138,21 +146,26 @@ module.exports = {
         throw new Error(error.message);
       }
     },
-    login: async (_, { admin, email, password, username, login }) => {
+    login: async (
+      _,
+      { loginUser: { admin, email, password, username, login } }
+    ) => {
       try {
         if (admin === "admin") {
-          if (!email || !password) throw new Error("BAD_REQUEST!");
+          if (!email || !password)
+            return { status: 400, message: "BAD_REQUEST!" };
 
           const findUsers = await model.findUserLogin(email);
 
-          if (!findUsers) throw new Error("SERVER_ERROR!");
+          if (!findUsers) return { status: 500, message: "SERVER_ERROR!" };
 
           const comparedPassword = await comparePassword(
             password,
             findUsers.user_password
           );
 
-          if (!comparedPassword) throw new Error("BAD_REQUEST!");
+          if (!comparedPassword)
+            return { status: 400, message: "BAD_REQUEST!" };
 
           const token = sign({ userId: findUsers.user_id });
 
@@ -162,11 +175,12 @@ module.exports = {
             data: { token },
           };
         } else if (admin === "super admin") {
-          if (!username || !login || !password) throw new Error("BAD_REQUEST!");
+          if (!username || !login || !password)
+            return { status: 400, message: "BAD_REQUEST!" };
 
           const findAdmin = await model.findAdminLogin(username);
 
-          if (!findAdmin) throw new Error("SERVER_ERROR!");
+          if (!findAdmin) return { status: 500, message: "SERVER_ERROR!" };
 
           const comparedPassword = await comparePassword(
             password,
@@ -178,7 +192,7 @@ module.exports = {
           );
 
           if (!comparedPassword || !comparedLogin)
-            throw new Error("BAD_REQUEST!");
+            return { status: 400, message: "BAD_REQUEST!" };
 
           const token = sign({ adminId: findAdmin.admin_id });
 
@@ -188,7 +202,7 @@ module.exports = {
             data: { token },
           };
         } else {
-          throw new Error("BAD_REQUEST!");
+          return { status: 400, message: "BAD_REQUEST!" };
         }
       } catch (error) {
         throw new Error(error.message);

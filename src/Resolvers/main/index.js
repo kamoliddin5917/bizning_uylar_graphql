@@ -14,11 +14,15 @@ const scalarEmail = require("../scalar/Email");
 // Enum
 const enumAdmin = require("../enum/Admin");
 
+// Union
+const unionResult = require("../union/Result");
+
 module.exports = [
   scalarUpload,
   scalarPassword,
   scalarEmail,
   enumAdmin,
+  unionResult,
   upload,
   users,
   companies,

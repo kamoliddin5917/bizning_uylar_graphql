@@ -43,7 +43,8 @@ module.exports = {
           companyId
         );
 
-        if (!createComplex) throw new Error("SERVER_ERROR_CREATED!");
+        if (!createComplex)
+          return { status: 500, message: "SERVER_ERROR_CREATED!" };
 
         pubSub.publish("COMPLEX_CREATED", {
           complexCreated: createComplex,
@@ -66,11 +67,12 @@ module.exports = {
       try {
         userAuth(ctx);
 
-        if (!name && !media && !inform) throw new Error("BAD_REQUEST!");
+        if (!name && !media && !inform)
+          return { status: 400, message: "BAD_REQUEST!" };
 
         const findComplex = await model.findComplex(id);
 
-        if (!findComplex) throw new Error("SERVER_ERROR_FIND!");
+        if (!findComplex) return { status: 500, message: "SERVER_ERROR_FIND!" };
 
         if (media) {
           const medias = await multipleFileUpload(media);
@@ -82,7 +84,8 @@ module.exports = {
             id
           );
 
-          if (!updateComplexMedia) throw new Error("SERVER_ERROR_UPDATED!");
+          if (!updateComplexMedia)
+            return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
           deleteFile(findComplex.complex_media);
 
@@ -103,7 +106,8 @@ module.exports = {
           id
         );
 
-        if (!updateComplex) throw new Error("SERVER_ERROR_UPDATED!");
+        if (!updateComplex)
+          return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
         pubSub.publish("COMPLEX_UPDATED", {
           complexUpdated: updateComplex,
@@ -124,7 +128,8 @@ module.exports = {
 
         const deleteComplex = await model.deleteComplex(id);
 
-        if (!deleteComplex) throw new Error("SERVER_ERROR_DELETED!");
+        if (!deleteComplex)
+          return { status: 500, message: "SERVER_ERROR_DELETED!" };
 
         deleteFile(deleteComplex.complex_media);
 

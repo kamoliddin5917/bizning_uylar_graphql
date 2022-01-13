@@ -12,25 +12,23 @@ module.exports = gql`
     date: String!
     complexes: [Complex]
   }
+
   extend type Mutation {
     createCompany(
       name: String!
       media: [Upload!]!
       inform: String!
-    ): ResultCompany!
+    ): ResultUnion!
+
     updateCompany(
       id: ID!
       name: String
       media: [Upload]
       inform: String
-    ): ResultCompany!
-    deleteCompany(id: ID!): ResultCompany!
+    ): ResultUnion!
+    deleteCompany(id: ID!): ResultUnion!
   }
-  type ResultCompany {
-    status: Int!
-    message: String!
-    company: Company!
-  }
+
   extend type Subscription {
     companyCreated: Company
     companyUpdated: Company

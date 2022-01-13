@@ -18,14 +18,14 @@ module.exports = gql`
       name: String!
       media: [Upload!]!
       inform: String!
-    ): ResultComplex!
+    ): ResultUnion!
     updateComplex(
       id: ID!
       name: String
       media: [Upload]
       inform: String
-    ): ResultComplex!
-    deleteComplex(id: ID!): ResultComplex!
+    ): ResultUnion!
+    deleteComplex(id: ID!): ResultUnion!
   }
   type ResultComplex {
     status: Int!

@@ -9,9 +9,7 @@ async function startServer() {
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
 
-  app.use("/", (_, res) => {
-    res.send({ message: "Assalomu Alaykum" });
-  });
+  app.use("/", require("./express/models/register/route"));
 }
 
 startServer();

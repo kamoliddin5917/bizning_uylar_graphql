@@ -52,7 +52,8 @@ module.exports = {
           complexId
         );
 
-        if (!createHouse) throw new Error("SERVER_ERROR_CREATED!");
+        if (!createHouse)
+          return { status: 500, message: "SERVER_ERROR_CREATED!" };
 
         pubSub.publish("HOUSE_CREATED", {
           houseCreated: createHouse,
@@ -76,11 +77,11 @@ module.exports = {
         userAuth(ctx);
 
         if (!floor && !room && !kvm && !kvmSum && !media && !inform)
-          throw new Error("BAD_REQUEST!");
+          return { status: 400, message: "BAD_REQUEST!" };
 
         const findHouse = await model.findHouse(id);
 
-        if (!findHouse) throw new Error("SERVER_ERROR_FIND!");
+        if (!findHouse) return { status: 500, message: "SERVER_ERROR_FIND!" };
 
         if (media) {
           const medias = await multipleFileUpload(media);
@@ -95,7 +96,8 @@ module.exports = {
             id
           );
 
-          if (!updateHouseMedia) throw new Error("SERVER_ERROR_UPDATED!");
+          if (!updateHouseMedia)
+            return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
           deleteFile(findHouse.house_media);
 
@@ -119,7 +121,8 @@ module.exports = {
           id
         );
 
-        if (!updateHouse) throw new Error("SERVER_ERROR_UPDATED!");
+        if (!updateHouse)
+          return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
         pubSub.publish("HOUSE_UPDATED", {
           houseUpdated: updateHouse,
@@ -140,7 +143,8 @@ module.exports = {
 
         const deleteHouse = await model.deleteHouse(id);
 
-        if (!deleteHouse) throw new Error("SERVER_ERROR_DELETED!");
+        if (!deleteHouse)
+          return { status: 500, message: "SERVER_ERROR_DELETED!" };
 
         deleteFile(deleteHouse.house_media);
 

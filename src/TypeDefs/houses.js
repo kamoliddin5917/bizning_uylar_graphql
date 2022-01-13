@@ -25,7 +25,7 @@ module.exports = gql`
       kvmSum: Int!
       media: [Upload!]!
       inform: String!
-    ): ResultHouse!
+    ): ResultUnion!
     updateHouse(
       id: ID!
       floor: Int
@@ -34,14 +34,10 @@ module.exports = gql`
       kvmSum: Int
       media: [Upload]
       inform: String
-    ): ResultHouse!
-    deleteHouse(id: ID!): ResultHouse!
+    ): ResultUnion!
+    deleteHouse(id: ID!): ResultUnion!
   }
-  type ResultHouse {
-    status: Int!
-    message: String!
-    house: House!
-  }
+
   extend type Subscription {
     houseCreated: House
     houseUpdated: House

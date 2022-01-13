@@ -47,7 +47,8 @@ module.exports = {
           medias
         );
 
-        if (!createBank) throw new Error("SERVER_ERROR_CREATED!");
+        if (!createBank)
+          return { status: 500, message: "SERVER_ERROR_CREATED!" };
 
         pubSub.publish("BANK_CREATED", {
           bankCreated: createBank,
@@ -71,11 +72,11 @@ module.exports = {
         adminAuth(ctx);
 
         if (!name && !email && !kriditSum && !kriditTime && !media && !inform)
-          throw new Error("BAD_REQUEST!");
+          return { status: 400, message: "BAD_REQUEST!" };
 
         const findBank = await model.findBank(id);
 
-        if (!findBank) throw new Error("SERVER_ERROR_FIND!");
+        if (!findBank) return { status: 500, message: "SERVER_ERROR_FIND!" };
 
         if (media) {
           const medias = await multipleFileUpload(media);
@@ -90,7 +91,8 @@ module.exports = {
             id
           );
 
-          if (!updateBankMedia) throw new Error("SERVER_ERROR_UPDATED!");
+          if (!updateBankMedia)
+            return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
           deleteFile(findBank.bank_media);
 
@@ -114,7 +116,8 @@ module.exports = {
           id
         );
 
-        if (!updateBank) throw new Error("SERVER_ERROR_UPDATED!");
+        if (!updateBank)
+          return { status: 500, message: "SERVER_ERROR_UPDATED!" };
 
         pubSub.publish("BANK_UPDATED", {
           bankUpdated: updateBank,
@@ -135,7 +138,8 @@ module.exports = {
 
         const deleteBank = await model.deleteBank(id);
 
-        if (!deleteBank) throw new Error("SERVER_ERROR_DELETED!");
+        if (!deleteBank)
+          return { status: 500, message: "SERVER_ERROR_DELETED!" };
 
         deleteFile(deleteBank.bank_media);
 

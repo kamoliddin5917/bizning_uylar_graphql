@@ -22,7 +22,7 @@ module.exports = gql`
       kriditTime: Int!
       media: [Upload!]!
       inform: String!
-    ): ResultBank!
+    ): ResultUnion!
     updateBank(
       id: ID!
       name: String
@@ -31,14 +31,10 @@ module.exports = gql`
       kriditTime: Int
       media: [Upload]
       inform: String
-    ): ResultBank!
-    deleteBank(id: ID!): ResultBank!
+    ): ResultUnion!
+    deleteBank(id: ID!): ResultUnion!
   }
-  type ResultBank {
-    status: Int!
-    message: String!
-    bank: Bank!
-  }
+
   extend type Subscription {
     bankCreated: Bank
     bankUpdated: Bank

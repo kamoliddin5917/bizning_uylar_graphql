@@ -8,6 +8,9 @@ const houses = require("../houses");
 const banks = require("../banks");
 const buyHouse = require("../buyHouse");
 
+// Union
+const union = require("../union");
+
 const typeDefs = gql`
   scalar Upload
   scalar Password
@@ -29,9 +32,15 @@ const typeDefs = gql`
   type Subscription {
     _: String
   }
+
+  type Error {
+    status: Int!
+    message: String!
+  }
 `;
 
 module.exports = [
+  union,
   typeDefs,
   upload,
   users,
