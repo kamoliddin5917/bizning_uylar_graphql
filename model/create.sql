@@ -6,9 +6,10 @@ CREATE TABLE verify_users(
     id SERIAL NOT NULL PRIMARY KEY,
     firstname varchar(50) not null,
     lastname varchar(50) not null,
-    email varchar(70) not null,
+    email varchar(70) unique not null,
     password text not null,
     cod bigint not null,
+    try_count int default 0,
     is_active boolean default false
 );
 
